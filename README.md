@@ -73,6 +73,4 @@ Whenever a user creates, modifies, or deletes a resource (like a project or clou
 
 Audit logs are easily queried to answer critical questions and support compliance needs.
 
----
-
 This audit trail system ensures that every operation in your platform is traceable, improving transparency, accountability, and security.
