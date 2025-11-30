@@ -1,3 +1,7 @@
+# Audit Trail in a Sensitive Operations Platform
+
+When building platforms that handle sensitive operations such as infrastructure provisioning, role management, or project automation, **visibility** is as crucial as **access control**.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -21,78 +25,54 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Why Audit Trails?
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+With users managing organizations, projects, and cloud resources—often collaboratively—it's essential to answer questions like:
+- **Who** created or modified a resource?
+- **When** did the action happen?
+- **What** changed?
 
-## Project setup
+## Audit Trail Goals
 
-```bash
-$ yarn install
+- **Automatic logging:** Every significant action triggers an audit log.
+- **Comprehensive context:** Each log includes user, organization, and resource details.
+- **Dedicated storage:** Logs are stored in a separate database table, enabling efficient querying and display.
+
+## Architecture Overview
+
+A typical flow for capturing audit information in the system:
+
+```
+Controller  
+   ↓  
+Service  
+   ↓  
+AuditService  
+  ↘            ↘
+AuditRepository  EventEmitter (async)
+     (DB)
 ```
 
-## Compile and run the project
+- **Direct Logging:** Actions record audit entries by calling `AuditService` directly.
+- **Async Logging:** For non-blocking cases, actions emit audit events captured asynchronously.
 
-```bash
-# development
-$ yarn run start
+## Example Scenario
 
-# watch mode
-$ yarn run start:dev
+Whenever a user creates, modifies, or deletes a resource (like a project or cloud resource), an audit record is created with:
+- **User context:** Who made the change.
+- **Organization context:** Under which organization the action happened.
+- **Resource details:** What resource was affected and how.
 
-# production mode
-$ yarn run start:prod
-```
+## Implementation in NestJS
 
-## Run tests
+- **AuditService:** Offers methods to generate audit logs for operations.
+- **AuditRepository:** Persists logs to a dedicated table.
+- **EventEmitter:** Used for background/async logging, maintaining system performance.
 
-```bash
-# unit tests
-$ yarn run test
+## Querying & Display
 
-# e2e tests
-$ yarn run test:e2e
+Audit logs are easily queried to answer critical questions and support compliance needs.
 
-# test coverage
-$ yarn run test:cov
-```
+---
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This audit trail system ensures that every operation in your platform is traceable, improving transparency, accountability, and security.
